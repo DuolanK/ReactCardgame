@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import socket from "../socket";
+import Chat from "./Chat";
 
 function Lobby() {
     const [rooms, setRooms] = useState([]);
@@ -27,6 +28,10 @@ function Lobby() {
             <button onClick={() => socket.emit("create_room", { name: "New Room" })}>
                 Создать комнату
             </button>
+                <div>
+                    <h1>WebSocket Chat</h1>
+                    <Chat roomId={1} /> {/* Укажите ID комнаты */}
+                </div>
         </div>
     );
 }
