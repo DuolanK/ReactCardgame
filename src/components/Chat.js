@@ -6,24 +6,13 @@ const Chat = ({ roomId }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        // Загружаем историю чата
-        const fetchHistory = async () => {
-            try {
-                const response = await fetch(`http://localhost:8000/room/history/${roomId}`);
-                const data = await response.json();
-                setMessages(data.map(msg => `${msg.user}: ${msg.content}`));
-            } catch (error) {
-                console.error("Failed to fetch chat history:", error);
-            }
-        };
-        fetchHistory();
-
-        // Подключаем WebSocket
-        const ws = new WebSocket(`ws://localhost:8000/ws/${roomId}`);
+        // Подключение к WebSocket серверу
+        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId}`);
         setSocket(ws);
 
+        // Слушаем события от сервера
         ws.onmessage = (event) => {
-            setMessages((prev) => [...prev, event.data]);
+            setMessages((prevMessages) => [...prevMessages, event.data]);
         };
 
         ws.onclose = () => {
@@ -31,14 +20,14 @@ const Chat = ({ roomId }) => {
         };
 
         return () => {
-            ws.close();
+            ws.close();  // Закрываем соединение при размонтировании компонента
         };
     }, [roomId]);
 
     const sendMessage = () => {
         if (socket && inputValue) {
-            socket.send(inputValue);
-            setMessages((prev) => [...prev, `You: ${inputValue}`]);
+            socket.send(inputValue);  // Отправляем сообщение на сервер
+            setMessages((prevMessages) => [...prevMessages, `You: ${inputValue}`]);
             setInputValue("");
         }
     };
