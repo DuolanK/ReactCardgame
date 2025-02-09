@@ -1,35 +1,45 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Chat from "./Chat";
 
 function Lobby() {
     const [rooms, setRooms] = useState([]);
+    const [newRoomName, setNewRoomName] = useState("");
 
-    // Пример, как можно получить комнаты (этот код можно настроить по вашему усмотрению)
     useEffect(() => {
-        // Симулируем получение списка комнат
-        setRooms([
-            { id: 1, name: "Room 1" },
-            { id: 2, name: "Room 2" },
-        ]);
+        fetch("http://127.0.0.1:8000/rooms")
+            .then((response) => response.json())
+            .then((data) => setRooms(data));
     }, []);
+
+    const createRoom = async () => {
+        if (!newRoomName) return;
+        const response = await fetch("http://127.0.0.1:8000/rooms", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: newRoomName }),
+        });
+        const room = await response.json();
+        setRooms([...rooms, room]);
+        setNewRoomName("");
+    };
 
     return (
         <div>
-            <h1>Lobby</h1>
+            <h1>Лобби</h1>
             <ul>
                 {rooms.map((room) => (
                     <li key={room.id}>
-                        <Link to={`/room/${room.id}`}>{room.name}</Link>
+                        <Link to={`/room/${room.id}`}>{room.name}</Link> ({room.participants} участников)
                     </li>
                 ))}
             </ul>
-
-            {/* Пример отображения чата */}
-            <div>
-                <h1>WebSocket Chat</h1>
-                <Chat roomId={1} /> {/* Укажите ID комнаты */}
-            </div>
+            <input
+                type="text"
+                placeholder="Название комнаты"
+                value={newRoomName}
+                onChange={(e) => setNewRoomName(e.target.value)}
+            />
+            <button onClick={createRoom}>Создать комнату</button>
         </div>
     );
 }

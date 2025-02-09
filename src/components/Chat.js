@@ -1,54 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-const Chat = ({ roomId }) => {
-    const [messages, setMessages] = useState([]);
-    const [inputValue, setInputValue] = useState("");
-    const [socket, setSocket] = useState(null);
+function ChatRoom({ roomName, username }) {
+    const [message, setMessage] = useState(""); // Состояние для текущего сообщения
+    const [messages, setMessages] = useState([]); // Состояние для списка сообщений
 
-    useEffect(() => {
-        // Подключение к WebSocket серверу
-        const ws = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId}`);
-        setSocket(ws);
-
-        // Слушаем события от сервера
-        ws.onmessage = (event) => {
-            setMessages((prevMessages) => [...prevMessages, event.data]);
-        };
-
-        ws.onclose = () => {
-            console.log("WebSocket connection closed");
-        };
-
-        return () => {
-            ws.close();  // Закрываем соединение при размонтировании компонента
-        };
-    }, [roomId]);
-
-    const sendMessage = () => {
-        if (socket && inputValue) {
-            socket.send(inputValue);  // Отправляем сообщение на сервер
-            setMessages((prevMessages) => [...prevMessages, `You: ${inputValue}`]);
-            setInputValue("");
+    // Обработчик отправки сообщения
+    const handleSendMessage = () => {
+        if (message.trim()) {
+            const newMessage = {
+                user: username,
+                text: message,
+                time: new Date().toLocaleTimeString(),
+            };
+            setMessages([...messages, newMessage]); // Добавляем новое сообщение в список
+            setMessage(""); // Очищаем поле ввода
         }
     };
 
     return (
         <div>
-            <h2>Room: {roomId}</h2>
-            <div style={{ border: "1px solid black", padding: "10px", height: "300px", overflowY: "scroll" }}>
-                {messages.map((msg, index) => (
-                    <div key={index}>{msg}</div>
-                ))}
+            <h2>Чат комнаты: {roomName}</h2>
+            <div>
+                <h3>Добро пожаловать, {username}!</h3>
             </div>
-            <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type your message"
-            />
-            <button onClick={sendMessage}>Send</button>
+
+            {/* Список сообщений */}
+            <div style={{ height: "300px", overflowY: "scroll", border: "1px solid #ccc" }}>
+                {messages.length === 0 ? (
+                    <p>Нет сообщений.</p>
+                ) : (
+                    messages.map((msg, index) => (
+                        <div key={index}>
+                            <strong>{msg.user}</strong>: {msg.text} <span>({msg.time})</span>
+                        </div>
+                    ))
+                )}
+            </div>
+
+            {/* Поле ввода и кнопка отправки */}
+            <div>
+                <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)} // Обновляем состояние при вводе
+                    placeholder="Введите сообщение..."
+                    style={{ width: "80%", padding: "10px" }}
+                />
+                <button onClick={handleSendMessage} style={{ padding: "10px", marginLeft: "10px" }}>
+                    Отправить
+                </button>
+            </div>
         </div>
     );
-};
+}
 
-export default Chat;
+export default ChatRoom;
