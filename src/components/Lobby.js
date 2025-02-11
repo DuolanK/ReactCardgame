@@ -6,14 +6,14 @@ function Lobby() {
     const [newRoomName, setNewRoomName] = useState("");
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/rooms")
+        fetch("http://127.0.0.1:3000/rooms")
             .then((response) => response.json())
             .then((data) => setRooms(data));
     }, []);
 
     const createRoom = async () => {
         if (!newRoomName) return;
-        const response = await fetch("http://127.0.0.1:8000/rooms", {
+        const response = await fetch("http://127.0.0.1:3000/rooms", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: newRoomName }),

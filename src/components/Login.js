@@ -8,7 +8,7 @@ function Login({ setIsAuthenticated }) {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/auth/login", {
+            const response = await fetch("http://127.0.0.1:3000/auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
                 body: new URLSearchParams({
@@ -22,8 +22,9 @@ function Login({ setIsAuthenticated }) {
             });
 
             const data = await response.json();
+            
             if (response.ok) {
-                localStorage.setItem("access_token", data.access_token);
+                localStorage.setItem("token", data.access_token);
                 alert("Вход выполнен!");
                 setIsAuthenticated(true); // Устанавливаем статус авторизации
                 navigate("/join"); // Перенаправляем на страницу с комнатами
