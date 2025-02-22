@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8000";
+const API_URL = "http://185.121.232.211:3000";
 
 export const joinRoom = async (roomName, username, password) => {
     const response = await fetch("/room/join-room/", {

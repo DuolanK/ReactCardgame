@@ -10,11 +10,12 @@ function JoinRoom({ setRoomName, setUsername, setInChat }) {
     const [usernameInput, setUsernameInput] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const apiUrl = process.env.REACT_APP_API_URL;
 
     useEffect(() => {
         const fetchRooms = async () => {
             try {
-                const response = await fetch("http://127.0.0.1:3000/room");
+                const response = await fetch(`${apiUrl}/room`);
                 const data = await response.json();
                 setRooms(data);
             } catch (error) {
@@ -22,7 +23,7 @@ function JoinRoom({ setRoomName, setUsername, setInChat }) {
             }
         };
         fetchRooms();
-    }, []);
+    }, [apiUrl]);
 
     const handleJoinRoom = async () => {
         if (!selectedRoom || !usernameInput || !password) {
@@ -31,11 +32,11 @@ function JoinRoom({ setRoomName, setUsername, setInChat }) {
         }
         
         // Декодируем токен и получаем user_id
-        const token = localStorage.getItem("token"); // или откуда ты его хранишь
+        const token = localStorage.getItem("token");
         let userId = null;
         if (token) {
             const decoded = jwtDecode(token);
-            userId = decoded.sub; // Убедись, что в токене есть этот ключ
+            userId = decoded.sub;
         }
     
         if (!userId) {
@@ -44,7 +45,7 @@ function JoinRoom({ setRoomName, setUsername, setInChat }) {
         }
     
         try {
-            const response = await fetch("http://127.0.0.1:3000/room/join-room/", {
+            const response = await fetch(`${apiUrl}/room/join-room/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -76,7 +77,7 @@ function JoinRoom({ setRoomName, setUsername, setInChat }) {
         if (!roomPassword) return;
 
         try {
-            const response = await fetch("http://127.0.0.1:3000/room/", {
+            const response = await fetch(`${apiUrl}/room/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

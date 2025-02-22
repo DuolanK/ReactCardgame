@@ -4,28 +4,52 @@ import { Link } from "react-router-dom";
 function Lobby() {
     const [rooms, setRooms] = useState([]);
     const [newRoomName, setNewRoomName] = useState("");
+    const [error, setError] = useState(null);
+    const apiUrl = process.env.REACT_APP_API_URL;
+    
 
     useEffect(() => {
-        fetch("http://127.0.0.1:3000/rooms")
-            .then((response) => response.json())
-            .then((data) => setRooms(data));
-    }, []);
+        const fetchRooms = async () => {
+            try {
+                const response = await fetch(`${apiUrl}/rooms`);
+                if (!response.ok) {
+                    throw new Error("Ошибка загрузки комнат");
+                }
+                const data = await response.json();
+                setRooms(data);
+            } catch (error) {
+                setError(error.message);
+            }
+        };
+        fetchRooms();
+    }, [apiUrl]); // Add apiUrl to the dependency array
 
     const createRoom = async () => {
         if (!newRoomName) return;
-        const response = await fetch("http://127.0.0.1:3000/rooms", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name: newRoomName }),
-        });
-        const room = await response.json();
-        setRooms([...rooms, room]);
-        setNewRoomName("");
+
+        try {
+            const response = await fetch(`${apiUrl}/rooms`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: newRoomName }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Ошибка создания комнаты");
+            }
+
+            const room = await response.json();
+            setRooms((prevRooms) => [...prevRooms, room]);
+            setNewRoomName("");
+        } catch (error) {
+            setError(error.message);
+        }
     };
 
     return (
         <div>
             <h1>Лобби</h1>
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <ul>
                 {rooms.map((room) => (
                     <li key={room.id}>
