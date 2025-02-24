@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Registration({ setIsAuthenticated }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false); // Loading state
     const apiUrl = process.env.REACT_APP_API_URL;
+    const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault(); // Prevent default form submission
@@ -35,6 +37,7 @@ function Registration({ setIsAuthenticated }) {
             if (response.ok) {
                 alert("Регистрация успешна!");
                 setIsAuthenticated(true); // Set authenticated status
+                navigate("/");
             } else {
                 alert(data.detail || "Ошибка регистрации.");
             }

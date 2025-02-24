@@ -38,7 +38,7 @@ function Login({ setIsAuthenticated }) {
                 localStorage.setItem("token", data.access_token);
                 alert("Вход выполнен!");
                 setIsAuthenticated(true); // Set authentication status
-                navigate("/join"); // Redirect to rooms page
+                navigate("/join"); // Redirect to room page
             } else {
                 alert(data.detail || "Ошибка входа.");
             }

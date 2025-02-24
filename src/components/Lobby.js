@@ -6,7 +6,7 @@ function Lobby() {
     const [newRoomName, setNewRoomName] = useState("");
     const [error, setError] = useState(null);
     const apiUrl = process.env.REACT_APP_API_URL;
-    
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchRooms = async () => {
